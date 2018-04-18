@@ -19,8 +19,9 @@ from IPython.core.display import Image
 TRAINING_IMAGES_DIR = os.getcwd() + '/training_images'
 TEST_IMAGES_DIR = os.getcwd() + "/test_images/"
 MAX_NUM_IMAGES_PER_CLASS = 2 ** 27 - 1  # ~134M
-TrainingDataPickleFile = 'trainingdata/BikeTrainingData.pkl'
-ValidationDataPickleFile = 'trainingdata/BikeValidationData.pkl'
+PickleFile = {}
+PickleFile["training"] = 'training_data/BikeTrainingData.pkl'
+PickleFile["validation"] = 'training_data/BikeValidationData.pkl'
 
 #######################################################################################################################
 def create_image_lists(image_dir, testing_percentage, validation_percentage):
@@ -109,31 +110,35 @@ if class_count == 0:
 if class_count == 1:
     tf.logging.error('Only one valid folder of images found at ' + TRAINING_IMAGES_DIR + ' - multiple classes are needed for classification.')
 
-Batch = np.empty((1,300*400*3), float32)
-Label = np.empty((1,1), int)
-MBLabel = np.zeros((1,1))
-RBLabel = np.ones((1,1))
-for label in image_lists.keys():
-    for filename in image_lists[label]["training"]:
-        path = TRAINING_IMAGES_DIR + "/" + image_lists[label]["dir"] + "/" + filename
-        im = cv2.imread(path)
-        res = cv2.resize(im,(400, 300), interpolation = cv2.INTER_CUBIC) # Resize image to 400,300
-        # !! 
-        vector = res.reshape(-1, 300*400*3) # Flatten vector
-        vector = vector / 255.0;             # Normalize
-        Batch = np.append(Batch, vector, axis = 0)
-        if(label == "mountain bikes"):
-            Label = np.append(Label, MBLabel, axis = 0)
-        if(label == "road bikes"):
-            Label = np.append(Label, RBLabel, axis = 0)
-            
-Batch = np.delete(Batch, 0,0)
-Label = np.delete(Label, 0,0)
+datasettypes = ["training", "validation"]
 
-print("X Training ", Batch.shape)
-print("Y Training ", Label.shape)
+for t in datasettypes:
+    Batch = np.empty((1,300*400*3), float32)
+    Label = np.empty((1,1), int)
+    MBLabel = np.zeros((1,1))
+    RBLabel = np.ones((1,1))
 
-with open(TrainingDataPickleFile, 'wb') as f:  # Python 3: open(..., 'wb')
-    pickle.dump([Batch, Label], f)
+    for label in image_lists.keys():
+        for filename in image_lists[label][t]:
+            path = TRAINING_IMAGES_DIR + "/" + image_lists[label]["dir"] + "/" + filename
+            im = cv2.imread(path)
+            res = cv2.resize(im,(400, 300), interpolation = cv2.INTER_CUBIC) # Resize image to 400,300
+            # !! 
+            vector = res.reshape(-1, 300*400*3) # Flatten vector
+            vector = vector / 255.0;             # Normalize
+            Batch = np.append(Batch, vector, axis = 0)
+            if(label == "mountain bikes"):
+                Label = np.append(Label, MBLabel, axis = 0)
+            if(label == "road bikes"):
+                Label = np.append(Label, RBLabel, axis = 0)
+                
+    Batch = np.delete(Batch, 0,0)
+    Label = np.delete(Label, 0,0)
 
-print("Training Data X, Y saved to ", TrainingDataPickleFile)
+    print("X ", t, " ", Batch.shape)
+    print("Y ", t, " ", Label.shape)
+
+    with open(PickleFile[t], 'wb') as f:  # Python 3: open(..., 'wb')
+        pickle.dump([Batch, Label], f)
+
+    print(t, " Data X, Y saved to ", PickleFile[t])
