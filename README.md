@@ -17,8 +17,12 @@ Example of road_bike_10.jpg
 ![](https://github.com/iamsurya/BikeClassifier/raw/master/example_road_bike_10.jpg)
 
 ## Usage
-You need to have python, scipy and tensorflow installed.  
+You need to have python, scipy (preferably anaconda) and tensorflow installed.  
 Then run the following commands to create a dataset, train and then test.
+
+### Clone this git repository
+
+`git clone https://github.com/iamsurya/BikeClassifier.git`
 
 ### Pre-processing
 First prep the images. This converts the images into numpy arrays.  
