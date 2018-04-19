@@ -9,7 +9,7 @@ original code would load the files twice
 because looking for .jpeg and .JPEG would 
 both return a file. Using the example code provided  
 would lead to loading the same files twice, i.e. you would iterate twice instead of once.  
-I've reported this as [an issue](https://github.com/MicrocontrollersAndMore/TensorFlow_Tut_2_Classification_Walk-through/issues/2)
+I've reported this as [an issue](https://github.com/MicrocontrollersAndMore/TensorFlow_Tut_2_Classification_Walk-through/issues/2) to the author.
 
 Example of mountain_bike_0.jpg  
 ![](https://github.com/iamsurya/BikeClassifier/raw/master/example_mountain_bike_0.jpg)
