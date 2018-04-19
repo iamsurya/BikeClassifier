@@ -20,8 +20,8 @@ TRAINING_IMAGES_DIR = os.getcwd() + '/training_images'
 TEST_IMAGES_DIR = os.getcwd() + "/test_images/"
 MAX_NUM_IMAGES_PER_CLASS = 2 ** 27 - 1  # ~134M
 PickleFile = {}
-PickleFile["training"] = 'training_data/BikeTrainingData.pkl'
-PickleFile["validation"] = 'training_data/BikeValidationData.pkl'
+PickleFile["training"] = 'training_data/GrayBikeTrainingData.pkl'
+PickleFile["validation"] = 'training_data/GrayBikeValidationData.pkl'
 
 #######################################################################################################################
 def create_image_lists(image_dir, testing_percentage, validation_percentage):
@@ -113,18 +113,18 @@ if class_count == 1:
 datasettypes = ["training", "validation"]
 
 for t in datasettypes:
-    Batch = np.empty((1,300*400*3), float32)
+    Batch = np.empty((1, 28*28), float32)
     Label = np.empty((1,1), int)
-    MBLabel = np.zeros((1,1))
+    MBLabel = np.zeros((1,1)) # Fixes shape so that append works
     RBLabel = np.ones((1,1))
 
     for label in image_lists.keys():
         for filename in image_lists[label][t]:
             path = TRAINING_IMAGES_DIR + "/" + image_lists[label]["dir"] + "/" + filename
-            im = cv2.imread(path)
-            res = cv2.resize(im,(400, 300), interpolation = cv2.INTER_CUBIC) # Resize image to 400,300
+            im = cv2.imread(path, cv2.IMREAD_GRAYSCALE)
+            res = cv2.resize(im,(28, 28), interpolation = cv2.INTER_CUBIC) # Resize image to 400,300
             # !! 
-            vector = res.reshape(-1, 300*400*3) # Flatten vector
+            vector = res.reshape(-1, 28*28) # Flatten vector
             vector = vector / 255.0;             # Normalize
             Batch = np.append(Batch, vector, axis = 0)
             if(label == "mountain bikes"):
@@ -137,7 +137,7 @@ for t in datasettypes:
 
     print("X ", t, " ", Batch.shape)
     print("Y ", t, " ", Label.shape)
-
+    
     with open(PickleFile[t], 'wb') as f:  # Python 3: open(..., 'wb')
         pickle.dump([Batch, Label], f)
 

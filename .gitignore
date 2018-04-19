@@ -102,3 +102,5 @@ ENV/
 
 # Data that can be recreated
 *.pkl
+events.out.tfevents.*
+trainedmodel/*.*

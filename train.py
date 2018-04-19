@@ -34,10 +34,14 @@ from __future__ import print_function
 import argparse
 import sys
 import tempfile
-
-from tensorflow.examples.tutorials.mnist import input_data
+import pickle
+import random 
+import numpy as np
+import os 
 
 import tensorflow as tf
+from tensorflow.python.platform import gfile
+from tensorflow.python.framework import graph_util
 
 FLAGS = None
 
@@ -57,6 +61,7 @@ def deepnn(x):
     # Reshape to use within a convolutional neural net.
     # Last dimension is for "features" - there is only one here, since images are
     # grayscale -- it would be 3 for an RGB image, 4 for RGBA, etc.
+    #### Our images are 300 X 400 X 3
     with tf.name_scope('reshape'):
         x_image = tf.reshape(x, [-1, 28, 28, 1])
 
@@ -96,12 +101,16 @@ def deepnn(x):
         h_fc1_drop = tf.nn.dropout(h_fc1, keep_prob)
 
     # Map the 1024 features to 10 classes, one for each digit
+    #### we have two classes, not 10
     with tf.name_scope('fc2'):
-        W_fc2 = weight_variable([1024, 10])
-        b_fc2 = bias_variable([10])
+        W_fc2 = weight_variable([1024, 2])
+        b_fc2 = bias_variable([2])
 
         y_conv = tf.matmul(h_fc1_drop, W_fc2) + b_fc2
-    return y_conv, keep_prob
+        LL = tf.nn.softmax(y_conv)
+        prediction = tf.argmax(LL, 1)
+
+    return y_conv, keep_prob, prediction, LL
 
 
 def conv2d(x, W):
@@ -126,19 +135,35 @@ def bias_variable(shape):
     initial = tf.constant(0.1, shape=shape)
     return tf.Variable(initial)
 
+def getbatch(BatchStart, Xtrain, Ytrain, randomindices):
+    BatchEnd = BatchStart+50
+    if(BatchEnd >= len(Xtrain)):
+        BatchEnd = len(Xtrain)
+    indices = randomindices[BatchStart:BatchEnd]
+    XBatch = np.take(Xtrain, indices, axis=0)
+    YBatch = np.squeeze(np.take(Ytrain, indices, axis=0).astype(int))
+    return XBatch, YBatch
+
 
 def main(_):
+    NUM_ITERATIONS = 101;
+
     # Import data
-    mnist = input_data.read_data_sets(FLAGS.data_dir)
+    [Xtrain, Ytrain] = pickle.load( open( 'training_data/GrayBikeTrainingData.pkl', "rb" ) )
+    [Xval, Yval] = pickle.load( open( 'training_data/GrayBikeValidationData.pkl', "rb" ) )    
+
+    randomindices = random.sample(range(len(Xtrain)), len(Xtrain));
+
+    BatchStart = 0;
 
     # Create the model
-    x = tf.placeholder(tf.float32, [None, 784])
+    x = tf.placeholder(tf.float32, [None, 28*28])
 
     # Define loss and optimizer
     y_ = tf.placeholder(tf.int64, [None])
 
     # Build the graph for the deep net
-    y_conv, keep_prob = deepnn(x)
+    y_conv, keep_prob, prediction, LL = deepnn(x)
 
     with tf.name_scope('loss'):
         cross_entropy = tf.losses.sparse_softmax_cross_entropy(
@@ -158,18 +183,27 @@ def main(_):
     train_writer = tf.summary.FileWriter(graph_location)
     train_writer.add_graph(tf.get_default_graph())
 
+    saver = tf.train.Saver()
+
     with tf.Session() as sess:
         sess.run(tf.global_variables_initializer())
-        for i in range(1700):
-            batch = mnist.train.next_batch(50)
+        for i in range(NUM_ITERATIONS):
+            batch = getbatch(BatchStart, Xtrain, Ytrain, randomindices)
+            BatchStart = BatchStart + 50;
+            if(BatchStart >= len(Xtrain)):
+                BatchStart = 0
             if i % 100 == 0:
                 train_accuracy = accuracy.eval(feed_dict={
                     x: batch[0], y_: batch[1], keep_prob: 1.0})
                 print('step %d, training accuracy %g' % (i, train_accuracy))
             train_step.run(feed_dict={x: batch[0], y_: batch[1], keep_prob: 0.5})
 
-        print('test accuracy %g' % accuracy.eval(feed_dict={
-            x: mnist.test.images, y_: mnist.test.labels, keep_prob: 1.0}))
+        #print('test accuracy %g' % accuracy.eval(feed_dict={
+        #    x: Xval, y_: np.squeeze(Yval), keep_prob: 1.0}))
+
+        # Save the trained graph
+        save_path = saver.save(sess, "trainedmodel/bikemodel.ckpt")
+        print ("Model saved in file: ", save_path)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
