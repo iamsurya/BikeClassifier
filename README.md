@@ -10,10 +10,10 @@ because looking for .jpeg and .JPEG would
 both return a file. Using the example code provided  
 would lead to loading the same files twice, i.e. you would iterate twice instead of once.  
 
-Example of mountain_bike_0.jpg
+Example of mountain_bike_0.jpg  
 ![](https://github.com/iamsurya/BikeClassifier/raw/master/example_mountain_bike_0.jpg)
 
-Example of road_bike_10.jpg
+Example of road_bike_10.jpg  
 ![](https://github.com/iamsurya/BikeClassifier/raw/master/example_road_bike_10.jpg)
 
 ## Usage
@@ -52,7 +52,14 @@ This had the following consequences:
 * The number of iterations required for training were reduced drastically. The original example using inception used 2000 iteration. In comparison, 100 iterations show 100% accuracy on the validation and test set.
 * Time required to train is reduced.  
 
-On the test set, confidence is shown to be 100% or close to 100%. Images that contained no colors (black and white) show 100% confidence. The presence of color seems to reduce this to 99%, which is a result of the colors affecting brightness levels when converted to grayscale. Amusingly, these results are much better than those shown in the given example which uses Google's inception model on full resolution colored images, showing how pre-processing and feature reduction can improve training and classification vastly, and we should not fully depend on a deep network.
+On the test set, confidence is shown to be 100% or close to 100%. Images that contained no colors (black and white) show 100% confidence. The presence of color seems to reduce this to 99%, which is a result of the colors affecting brightness levels when converted to grayscale.  
+
+Amusingly, these results are much better than those shown in the [MicrocontrollersAndMore/TensorFlow_Tut_2_Classification_Walk-through
+](https://github.com/MicrocontrollersAndMore/TensorFlow_Tut_2_Classification_Walk-through) example which uses Google's inception model on full resolution colored images, showing how pre-processing and feature reduction can improve training and classification vastly, and we should not fully depend on a deep network.  
+
+Given that we needed only 100 iterations to classify well, we could deal with this classification problem with traditional CV methods like edge detection, template matching, PCA and / or SIFT. An example of the average image for the two classes shows this as well, because the bikes can be reduced to just their edges and frames. See [VisBikes.ipynb](https://github.com/iamsurya/BikeClassifier/blob/master/VisBikes.ipynb) for more images.  
+
+![](https://github.com/iamsurya/BikeClassifier/raw/master/averageimg.jpg)
 
 ## Model
 
