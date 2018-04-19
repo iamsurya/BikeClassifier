@@ -59,7 +59,7 @@ Amusingly, these results are much better than those shown in the [Microcontrolle
 
 Given that we needed only 100 iterations to classify well, we could deal with this classification problem with traditional CV methods like edge detection, template matching, PCA and / or SIFT. An example of the average image for the two classes shows this as well, because the bikes can be reduced to just their edges and frames. See [VisBikes.ipynb](https://github.com/iamsurya/BikeClassifier/blob/master/VisBikes.ipynb) for more images.  
 
-![](https://github.com/iamsurya/BikeClassifier/raw/master/averageimg.jpg)
+![](https://github.com/iamsurya/BikeClassifier/raw/master/averageimg.png)
 
 ## Model
 
