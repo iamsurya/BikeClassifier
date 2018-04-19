@@ -3,6 +3,8 @@
 # original file from Google:
 # https://github.com/tensorflow/tensorflow/blob/master/tensorflow/examples/tutorials/mnist/mnist_deep.py
 
+# Modified by Surya Sharma to import a different dataset and use only 2 classes.
+
 # Copyright 2015 The TensorFlow Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -26,6 +28,7 @@ https://www.tensorflow.org/get_started/mnist/pros
 # Disable linter warnings to maintain consistency with tutorial.
 # pylint: disable=invalid-name
 # pylint: disable=g-bad-import-order
+
 
 from __future__ import absolute_import
 from __future__ import division
@@ -198,8 +201,8 @@ def main(_):
                 print('step %d, training accuracy %g' % (i, train_accuracy))
             train_step.run(feed_dict={x: batch[0], y_: batch[1], keep_prob: 0.5})
 
-        #print('test accuracy %g' % accuracy.eval(feed_dict={
-        #    x: Xval, y_: np.squeeze(Yval), keep_prob: 1.0}))
+        print('Validation set accuracy %g' % accuracy.eval(feed_dict={
+            x: Xval, y_: np.squeeze(Yval), keep_prob: 1.0}))
 
         # Save the trained graph
         save_path = saver.save(sess, "trainedmodel/bikemodel.ckpt")

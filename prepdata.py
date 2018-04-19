@@ -1,3 +1,13 @@
+# prepdata.py
+
+# Some code reused from from MicrocontrollersAndMore:
+# https://github.com/MicrocontrollersAndMore/TensorFlow_Tut_2_Classification_Walk-through
+# ==============================================================================
+# This file loads images and converts them into 28x28x1 grayscales, then
+# saves them to a binary file using pickle
+################################################################################
+
+
 import pickle
 import hashlib
 import os

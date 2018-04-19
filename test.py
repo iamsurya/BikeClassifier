@@ -1,4 +1,6 @@
 # test.py
+# Some code reused from from MicrocontrollersAndMore:
+# https://github.com/MicrocontrollersAndMore/TensorFlow_Tut_2_Classification_Walk-through
 
 import os
 import tensorflow as tf
