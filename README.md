@@ -11,10 +11,10 @@ both return a file. Using the example code provided
 would lead to loading the same files twice, i.e. you would iterate twice instead of once.  
 
 Example of mountain_bike_0.jpg
-![](https://github.com/iamsurya/BikeClassifier/raw/master/example_mountain_bikes/mountain_bike_0.jpg)
+![](https://github.com/iamsurya/BikeClassifier/raw/master/example_mountain_bike_0.jpg)
 
 Example of road_bike_10.jpg
-![](https://github.com/iamsurya/BikeClassifier/raw/master/example_road_bikes/road_bike_10.jpg)
+![](https://github.com/iamsurya/BikeClassifier/raw/master/example_road_bike_10.jpg)
 
 ## Usage
 You need to have python, scipy and tensorflow installed.  
