@@ -3,12 +3,13 @@ Image learning classifier using the [mnist-deep](https://github.com/tensorflow/t
 Some code from [MicrocontrollersAndMore/TensorFlow_Tut_2_Classification_Walk-through
 ](https://github.com/MicrocontrollersAndMore/TensorFlow_Tut_2_Classification_Walk-through) (2)  
 was used for parsing file lists and for test.py.
-The code from (2) is adapted for Windows,  
+The code from (2) is for Windows,  
 which does not have case sensitive filenames. The 
 original code would load the files twice  
 because looking for .jpeg and .JPEG would 
 both return a file. Using the example code provided  
 would lead to loading the same files twice, i.e. you would iterate twice instead of once.  
+I've reported this as [an issue](https://github.com/MicrocontrollersAndMore/TensorFlow_Tut_2_Classification_Walk-through/issues/2)
 
 Example of mountain_bike_0.jpg  
 ![](https://github.com/iamsurya/BikeClassifier/raw/master/example_mountain_bike_0.jpg)
