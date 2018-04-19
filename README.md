@@ -62,6 +62,9 @@ Given that we needed only 100 iterations to classify well, we could deal with th
 
 ![](https://github.com/iamsurya/BikeClassifier/raw/master/averageimg.png)
 
+## To-Do
+Try adding more variation to the dataset by resizing, shifting, scaling and rotating the input images. This should add more regularization to the training, and also reduce the accuracy but make the NN more robust.
+
 ## Model
 
 The main graph for the network used in the [mnist-deep example](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/examples/tutorials/mnist/mnist_deep.py) from the [Tensorboard Screenshot](https://github.com/iamsurya/BikeClassifier/raw/master/TensorboardScreenshot.PNG) shows the following network:  
