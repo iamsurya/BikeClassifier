@@ -56,15 +56,16 @@ def deepnn(x):
       number of pixels in a standard MNIST image.
 
     Returns:
-      A tuple (y, keep_prob). y is a tensor of shape (N_examples, 10), with values
+      A tuple (y, keep_prob, prediction, LL). y is a tensor of shape (N_examples, 10), with values
       equal to the logits of classifying the digit into one of 10 classes (the
       digits 0-9). keep_prob is a scalar placeholder for the probability of
       dropout.
+      prediction is the label assigned by the classifier
+      LL is the score for the classes
     """
     # Reshape to use within a convolutional neural net.
     # Last dimension is for "features" - there is only one here, since images are
     # grayscale -- it would be 3 for an RGB image, 4 for RGBA, etc.
-    #### Our images are 300 X 400 X 3
     with tf.name_scope('reshape'):
         x_image = tf.reshape(x, [-1, 28, 28, 1])
 
@@ -103,8 +104,7 @@ def deepnn(x):
         keep_prob = tf.placeholder(tf.float32)
         h_fc1_drop = tf.nn.dropout(h_fc1, keep_prob)
 
-    # Map the 1024 features to 10 classes, one for each digit
-    #### we have two classes, not 10
+    # Map the 1024 features to 2 classes, one for each label
     with tf.name_scope('fc2'):
         W_fc2 = weight_variable([1024, 2])
         b_fc2 = bias_variable([2])
@@ -138,6 +138,18 @@ def bias_variable(shape):
     initial = tf.constant(0.1, shape=shape)
     return tf.Variable(initial)
 
+"""get batch returns the batch to be fed to the NN.
+
+    Args:
+      BatchStart: index of sample where batch starts
+      XTrain: Training samples
+      YTrain: Training labels
+      randomindices: randomized indices between 0 and len(XTrain)
+
+    Returns:
+      A tuple (XBatch, YBatch). XBatch is a flattend vector of shape (50, 28*28)
+      YBatch contains ground truth labels for each sample.
+    """
 def getbatch(BatchStart, Xtrain, Ytrain, randomindices):
     BatchEnd = BatchStart+50
     if(BatchEnd >= len(Xtrain)):
@@ -149,25 +161,28 @@ def getbatch(BatchStart, Xtrain, Ytrain, randomindices):
 
 
 def main(_):
+    # Fixed this to 101 because we see 100% accuracy at 100 iterations.
     NUM_ITERATIONS = 101;
 
     # Import data
     [Xtrain, Ytrain] = pickle.load( open( 'training_data/GrayBikeTrainingData.pkl', "rb" ) )
     [Xval, Yval] = pickle.load( open( 'training_data/GrayBikeValidationData.pkl', "rb" ) )    
 
+    # Used to randomize the batches given to the NN. Without this the NN will learn slowly
+    # and initally learn the first class really well, and not learn the second one at all.
     randomindices = random.sample(range(len(Xtrain)), len(Xtrain));
 
     BatchStart = 0;
 
     # Create the model
-    x = tf.placeholder(tf.float32, [None, 28*28])
+    x = tf.placeholder(tf.float32, [None, 28*28]) # Tensor for input samples
 
-    # Define loss and optimizer
-    y_ = tf.placeholder(tf.int64, [None])
+    y_ = tf.placeholder(tf.int64, [None])  # Tensor for labels
 
     # Build the graph for the deep net
     y_conv, keep_prob, prediction, LL = deepnn(x)
 
+    # The cost function without regularization or dropout
     with tf.name_scope('loss'):
         cross_entropy = tf.losses.sparse_softmax_cross_entropy(
             labels=y_, logits=y_conv)
@@ -181,17 +196,20 @@ def main(_):
         correct_prediction = tf.cast(correct_prediction, tf.float32)
     accuracy = tf.reduce_mean(correct_prediction)
 
+    # save the graph
     graph_location = tempfile.mkdtemp()
     print('Saving graph to: %s' % graph_location)
     train_writer = tf.summary.FileWriter(graph_location)
     train_writer.add_graph(tf.get_default_graph())
 
+    # Object to save the model params
     saver = tf.train.Saver()
 
     with tf.Session() as sess:
         sess.run(tf.global_variables_initializer())
         for i in range(NUM_ITERATIONS):
             batch = getbatch(BatchStart, Xtrain, Ytrain, randomindices)
+            # Increment the index to start the next batch
             BatchStart = BatchStart + 50;
             if(BatchStart >= len(Xtrain)):
                 BatchStart = 0
@@ -201,6 +219,7 @@ def main(_):
                 print('step %d, training accuracy %g' % (i, train_accuracy))
             train_step.run(feed_dict={x: batch[0], y_: batch[1], keep_prob: 0.5})
 
+        # Finished training. Check accuracy vs Valdiation set
         print('Validation set accuracy %g' % accuracy.eval(feed_dict={
             x: Xval, y_: np.squeeze(Yval), keep_prob: 1.0}))
 

@@ -23,12 +23,13 @@ import tensorflow as tf
 
 from tensorflow.python.platform import gfile
 from tensorflow.python.util import compat
-
 from IPython.core.display import Image 
 
 TRAINING_IMAGES_DIR = os.getcwd() + '/training_images'
 TEST_IMAGES_DIR = os.getcwd() + "/test_images/"
 MAX_NUM_IMAGES_PER_CLASS = 2 ** 27 - 1  # ~134M
+
+# Set location of the exported binary data file
 PickleFile = {}
 PickleFile["training"] = 'training_data/GrayBikeTrainingData.pkl'
 PickleFile["validation"] = 'training_data/GrayBikeValidationData.pkl'
@@ -113,19 +114,25 @@ def create_image_lists(image_dir, testing_percentage, validation_percentage):
     return result
 # end function
 
+# Create list of paths to image (Split into 10% validation and 0% testing)
+# Test set has already been seperated into a different folder
 image_lists = create_image_lists(TRAINING_IMAGES_DIR, 0, 10)
+
+# Error if multiple classes are not found
 class_count = len(image_lists.keys())
 if class_count == 0:
     tf.logging.error('No valid folders of images found at ' + TRAINING_IMAGES_DIR)
 if class_count == 1:
     tf.logging.error('Only one valid folder of images found at ' + TRAINING_IMAGES_DIR + ' - multiple classes are needed for classification.')
 
+# lists is a python dictionary containing training, validation and test lists
 datasettypes = ["training", "validation"]
 
+# For each list, load, resize and save the images as flat vector in a pickle file.
 for t in datasettypes:
     Batch = np.empty((1, 28*28), float32)
     Label = np.empty((1,1), int)
-    MBLabel = np.zeros((1,1)) # Fixes shape so that append works
+    MBLabel = np.zeros((1,1)) # We need a fixed shape for np.append
     RBLabel = np.ones((1,1))
 
     for label in image_lists.keys():

@@ -29,7 +29,6 @@ def deepnn(x):
     # Reshape to use within a convolutional neural net.
     # Last dimension is for "features" - there is only one here, since images are
     # grayscale -- it would be 3 for an RGB image, 4 for RGBA, etc.
-    #### Our images are 300 X 400 X 3
     with tf.name_scope('reshape'):
         x_image = tf.reshape(x, [-1, 28, 28, 1])
 
@@ -68,8 +67,7 @@ def deepnn(x):
         keep_prob = tf.placeholder(tf.float32)
         h_fc1_drop = tf.nn.dropout(h_fc1, keep_prob)
 
-    # Map the 1024 features to 10 classes, one for each digit
-    #### we have two classes, not 10
+    # Map the 1024 features to 2 classes, one for each label
     with tf.name_scope('fc2'):
         W_fc2 = weight_variable([1024, 2])
         b_fc2 = bias_variable([2])
@@ -168,18 +166,12 @@ def main():
             # Convert image to tensor
             im = cv2.imread(imageFileWithPath, cv2.IMREAD_GRAYSCALE)
             res = cv2.resize(im, (28, 28), interpolation = cv2.INTER_CUBIC) # Resize image to 28,28
-            # !! 
             vector = res.reshape(-1, 28*28) # Flatten vector
             vector = vector / 255.0;             # Normalize
 
             b = LL.eval(feed_dict={x: vector,keep_prob: 1.0}, session=sess)
-
-            #sortedPredictions = b.argsort()[-len(b):][::-1]
-            #print(b);
-            #print(np.argmax(b));
-            #print("\n");
-            prediction = np.argmax(b)
-            scoreAsAPercent = np.max(b) * 100.0
+            prediction = np.argmax(b) # Class label
+            scoreAsAPercent = np.max(b) * 100.0 # Confidence
             strClassification = classifications[prediction]
             print("the object appears to be a " + strClassification + ", " + "{0:.4f}".format(scoreAsAPercent) + "% confidence")
             writeResultOnImage(openCVImage, strClassification + ", " + "{0:.4}".format(scoreAsAPercent) + "% confidence")
