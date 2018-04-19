@@ -10,6 +10,12 @@ because looking for .jpeg and .JPEG would
 both return a file. Using the example code provided  
 would lead to loading the same files twice, i.e. you would iterate twice instead of once.  
 
+Example of mountain_bike_0.jpg
+![](https://github.com/iamsurya/BikeClassifier/raw/master/training_images/mountain_bikes/mountain_bike_0.jpg =400x400)
+
+Example of road_bike_10.jpg
+![](https://github.com/iamsurya/BikeClassifier/raw/master/training_images/road_bikes/road_bike_10.jpg =400x400)
+
 ## Usage
 You need to have python, scipy and tensorflow installed.  
 Then run the following commands to create a dataset, train and then test.
